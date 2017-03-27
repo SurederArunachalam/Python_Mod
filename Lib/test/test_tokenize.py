@@ -1394,7 +1394,8 @@ class TestTokenize(TestCase):
         self.assertExactTypeEqual('->', token.RARROW)
         self.assertExactTypeEqual('@', token.AT)
         self.assertExactTypeEqual('@=', token.ATEQUAL)
-
+        self.assertExactTypeEqual('<==', token.SURENEQUAL)
+        
         self.assertExactTypeEqual('a**2+b**2==c**2',
                                   NAME, token.DOUBLESTAR, NUMBER,
                                   token.PLUS,
