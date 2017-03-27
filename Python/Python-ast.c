@@ -84,6 +84,7 @@ static char *Assign_fields[]={
     "value",
 };
 static PyTypeObject *AugAssign_type;
+static PyTypeObject *MyAssign_type;
 _Py_IDENTIFIER(target);
 _Py_IDENTIFIER(op);
 static char *AugAssign_fields[]={
@@ -892,6 +893,8 @@ static int init_types(void)
     if (!Assign_type) return 0;
     AugAssign_type = make_type("AugAssign", stmt_type, AugAssign_fields, 3);
     if (!AugAssign_type) return 0;
+    MyAssign_type = make_type("MyAssign", stmt_type, AugAssign_fields, 3);
+    if (!MyAssign_type) return 0;
     AnnAssign_type = make_type("AnnAssign", stmt_type, AnnAssign_fields, 4);
     if (!AnnAssign_type) return 0;
     For_type = make_type("For", stmt_type, For_fields, 4);
@@ -1430,6 +1433,39 @@ AugAssign(expr_ty target, operator_ty op, expr_ty value, int lineno, int
     p->col_offset = col_offset;
     return p;
 }
+//MyCode
+stmt_ty
+MyAssign(expr_ty target, my_operator op, expr_ty value, int lineno, int
+          col_offset, PyArena *arena)
+{
+    stmt_ty p;
+    if (!target) {
+        PyErr_SetString(PyExc_ValueError,
+                        "field target is required for MyAssign");
+        return NULL;
+    }
+    if (!op) {
+        PyErr_SetString(PyExc_ValueError,
+                        "field op is required for MyAssign");
+        return NULL;
+    }
+    if (!value) {
+        PyErr_SetString(PyExc_ValueError,
+                        "field value is required for MyAssign");
+        return NULL;
+    }
+    p = (stmt_ty)PyArena_Malloc(arena, sizeof(*p));
+    if (!p)
+        return NULL;
+    p->kind = MyAssign_kind;
+    p->v.MyAssign.target = target;
+    p->v.MyAssign.op = op;
+    p->v.MyAssign.value = value;
+    p->lineno = lineno;
+    p->col_offset = col_offset;
+    return p;
+}
+//My Code
 
 stmt_ty
 AnnAssign(expr_ty target, expr_ty annotation, expr_ty value, int simple, int
