@@ -1158,7 +1158,7 @@ ast_for_augassign(struct compiling *c, const node *n)
 static my_operator//MyCode
 ast_for_myassign(struct compiling *c, const node *n)
 {
-    REQ(n, augassign);
+    REQ(n, myassign);
     n = CHILD(n, 0);
     switch (TYPE(n)) {
         case SURENEQUAL:
@@ -2964,7 +2964,7 @@ ast_for_expr_stmt(struct compiling *c, const node *n)
         return AugAssign(expr1, newoperator, expr2, LINENO(n), n->n_col_offset, c->c_arena);
     }
     //mycode
-    else if (TYPE(CHILD(n, 1)) == augassign) {
+    else if (TYPE(CHILD(n, 1)) == myassign) {
         expr_ty expr1, expr2;
         my_operator newoperator;
         node *ch = CHILD(n, 0);
