@@ -1162,7 +1162,7 @@ ast_for_myassign(struct compiling *c, const node *n)
     n = CHILD(n, 0);
     switch (TYPE(n)) {
         case SURENEQUAL:
-            return Add;
+            return Cassign;
         default:
             PyErr_Format(PyExc_SystemError, "invalid myassign: %s", STR(n));
             return (my_operator)0;
