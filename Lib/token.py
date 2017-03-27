@@ -68,6 +68,7 @@ AWAIT = 54
 ASYNC = 55
 ERRORTOKEN = 56
 N_TOKENS = 57
+SURENEQUAL = 58
 NT_OFFSET = 256
 #--end constants--
 
