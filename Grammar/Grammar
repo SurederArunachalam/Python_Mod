@@ -42,10 +42,10 @@ small_stmt: (expr_stmt | del_stmt | pass_stmt | flow_stmt |
 expr_stmt: testlist_star_expr (annassign | myassign (yield_expr|testlist) | augassign (yield_expr|testlist) |
                      ('=' (yield_expr|testlist_star_expr))*)
 annassign: ':' test ['=' test]
-myassign: ('<==')
 testlist_star_expr: (test|star_expr) (',' (test|star_expr))* [',']
 augassign: ('+=' | '-=' | '*=' | '@=' | '/=' | '%=' | '&=' | '|=' | '^=' |
             '<<=' | '>>=' | '**=' | '//=')
+myassign: ('<==')
 # For normal and annotated assignments, additional restrictions enforced by the interpreter
 del_stmt: 'del' exprlist
 pass_stmt: 'pass'
