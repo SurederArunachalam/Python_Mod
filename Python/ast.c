@@ -1155,6 +1155,20 @@ ast_for_augassign(struct compiling *c, const node *n)
     }
 }
 
+static my_operator//MyCode
+ast_for_myassign(struct compiling *c, const node *n)
+{
+    REQ(n, augassign);
+    n = CHILD(n, 0);
+    switch (TYPE(n)) {
+        case SURENEQUAL:
+            return Add;
+        default:
+            PyErr_Format(PyExc_SystemError, "invalid myassign: %s", STR(n));
+            return (my_operator)0;
+    }
+}//My Code
+
 static cmpop_ty
 ast_for_comp_op(struct compiling *c, const node *n)
 {
@@ -2900,6 +2914,7 @@ ast_for_expr_stmt(struct compiling *c, const node *n)
        testlist_star_expr: (test|star_expr) (',' test|star_expr)* [',']
        augassign: '+=' | '-=' | '*=' | '@=' | '/=' | '%=' | '&=' | '|=' | '^='
                 | '<<=' | '>>=' | '**=' | '//='
+       myassign: '<=='
        test: ... here starts the operator precedence dance
      */
 
@@ -2948,6 +2963,46 @@ ast_for_expr_stmt(struct compiling *c, const node *n)
 
         return AugAssign(expr1, newoperator, expr2, LINENO(n), n->n_col_offset, c->c_arena);
     }
+    //mycode
+    else if (TYPE(CHILD(n, 1)) == augassign) {
+        expr_ty expr1, expr2;
+        my_operator newoperator;
+        node *ch = CHILD(n, 0);
+
+        expr1 = ast_for_testlist(c, ch);
+        if (!expr1)
+            return NULL;
+        if(!set_context(c, expr1, Store, ch))
+            return NULL;
+        /* set_context checks that most expressions are not the left side.
+          Augmented assignments can only have a name, a subscript, or an
+          attribute on the left, though, so we have to explicitly check for
+          those. */
+        switch (expr1->kind) {
+            case Name_kind:
+            case Attribute_kind:
+            case Subscript_kind:
+                break;
+            default:
+                ast_error(c, ch, "illegal expression for my assignment");
+                return NULL;
+        }
+
+        ch = CHILD(n, 2);
+        if (TYPE(ch) == testlist)
+            expr2 = ast_for_testlist(c, ch);
+        else
+            expr2 = ast_for_expr(c, ch);
+        if (!expr2)
+            return NULL;
+
+        newoperator = ast_for_myassign(c, CHILD(n, 1));
+        if (!newoperator)
+            return NULL;
+
+        return MyAssign(expr1, newoperator, expr2, LINENO(n), n->n_col_offset, c->c_arena);
+    }
+    //mycode
     else if (TYPE(CHILD(n, 1)) == annassign) {
         expr_ty expr1, expr2, expr3;
         node *ch = CHILD(n, 0);
