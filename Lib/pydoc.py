@@ -1751,7 +1751,8 @@ class Helper:
         'AUGMENTEDASSIGNMENT' : ('+=', '-=', '*=', '/=', '%=', '&=', '|=',
                                 '^=', '<<=', '>>=', '**=', '//='),
         'BITWISE' : ('<<', '>>', '&', '|', '^', '~'),
-        'COMPLEX' : ('j', 'J')
+        'COMPLEX' : ('j', 'J'),
+        'MYASSIGNMENT' : ('<==')
     }
     symbols = {
         '%': 'OPERATORS FORMATTING',
