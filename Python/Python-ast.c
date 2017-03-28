@@ -2849,6 +2849,25 @@ ast2obj_stmt(void* _o)
             goto failed;
         Py_DECREF(value);
         break;
+     case MyAssign_kind:
+        result = PyType_GenericNew(MyAssign_type, NULL, NULL);
+        if (!result) goto failed;
+        value = ast2obj_expr(o->v.MyAssign.target);
+        if (!value) goto failed;
+        if (_PyObject_SetAttrId(result, &PyId_target, value) == -1)
+            goto failed;
+        Py_DECREF(value);
+        value = ast2obj_operator(o->v.MyAssign.op);
+        if (!value) goto failed;
+        if (_PyObject_SetAttrId(result, &PyId_op, value) == -1)
+            goto failed;
+        Py_DECREF(value);
+        value = ast2obj_expr(o->v.MyAssign.value);
+        if (!value) goto failed;
+        if (_PyObject_SetAttrId(result, &PyId_value, value) == -1)
+            goto failed;
+        Py_DECREF(value);
+        break;
     case AnnAssign_kind:
         result = PyType_GenericNew(AnnAssign_type, NULL, NULL);
         if (!result) goto failed;
@@ -4760,6 +4779,54 @@ obj2ast_stmt(PyObject* obj, stmt_ty* out, PyArena* arena)
         if (*out == NULL) goto failed;
         return 0;
     }
+    //My Code
+    isinstance = PyObject_IsInstance(obj, (PyObject*)MyAssign_type);
+    if (isinstance == -1) {
+        return 1;
+    }
+    if (isinstance) {
+        expr_ty target;
+        operator_ty op;
+        expr_ty value;
+
+        if (_PyObject_HasAttrId(obj, &PyId_target)) {
+            int res;
+            tmp = _PyObject_GetAttrId(obj, &PyId_target);
+            if (tmp == NULL) goto failed;
+            res = obj2ast_expr(tmp, &target, arena);
+            if (res != 0) goto failed;
+            Py_CLEAR(tmp);
+        } else {
+            PyErr_SetString(PyExc_TypeError, "required field \"target\" missing from MyAssign");
+            return 1;
+        }
+        if (_PyObject_HasAttrId(obj, &PyId_op)) {
+            int res;
+            tmp = _PyObject_GetAttrId(obj, &PyId_op);
+            if (tmp == NULL) goto failed;
+            res = obj2ast_operator(tmp, &op, arena);
+            if (res != 0) goto failed;
+            Py_CLEAR(tmp);
+        } else {
+            PyErr_SetString(PyExc_TypeError, "required field \"op\" missing from AugAssign");
+            return 1;
+        }
+        if (_PyObject_HasAttrId(obj, &PyId_value)) {
+            int res;
+            tmp = _PyObject_GetAttrId(obj, &PyId_value);
+            if (tmp == NULL) goto failed;
+            res = obj2ast_expr(tmp, &value, arena);
+            if (res != 0) goto failed;
+            Py_CLEAR(tmp);
+        } else {
+            PyErr_SetString(PyExc_TypeError, "required field \"value\" missing from MyAssign");
+            return 1;
+        }
+        *out = MyAssign(target, op, value, lineno, col_offset, arena);
+        if (*out == NULL) goto failed;
+        return 0;
+    }
+    //MY Code
     isinstance = PyObject_IsInstance(obj, (PyObject*)AnnAssign_type);
     if (isinstance == -1) {
         return 1;
