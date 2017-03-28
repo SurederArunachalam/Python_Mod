@@ -402,6 +402,9 @@ validate_stmt(stmt_ty stmt)
     case AugAssign_kind:
         return validate_expr(stmt->v.AugAssign.target, Store) &&
             validate_expr(stmt->v.AugAssign.value, Load);
+    case MyAssign_kind://MyCode
+        return validate_expr(stmt->v.MyAssign.target, Store) &&
+            validate_expr(stmt->v.MyAssign.value, Load);//MyCode
     case AnnAssign_kind:
         if (stmt->v.AnnAssign.target->kind != Name_kind &&
             stmt->v.AnnAssign.simple) {
