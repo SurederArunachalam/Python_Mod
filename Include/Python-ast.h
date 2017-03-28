@@ -73,7 +73,7 @@ enum _stmt_kind {FunctionDef_kind=1, AsyncFunctionDef_kind=2, ClassDef_kind=3,
                   AsyncWith_kind=14, Raise_kind=15, Try_kind=16,
                   Assert_kind=17, Import_kind=18, ImportFrom_kind=19,
                   Global_kind=20, Nonlocal_kind=21, Expr_kind=22, Pass_kind=23,
-                  Break_kind=24, Continue_kind=25, MyAssign_Kind=26};
+                  Break_kind=24, Continue_kind=25, MyAssign_kind=26};
 struct _stmt {
     enum _stmt_kind kind;
     union {
