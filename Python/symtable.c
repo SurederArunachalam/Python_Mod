@@ -1227,6 +1227,10 @@ symtable_visit_stmt(struct symtable *st, stmt_ty s)
         VISIT(st, expr, s->v.AugAssign.target);
         VISIT(st, expr, s->v.AugAssign.value);
         break;
+    case MyAssign_kind:
+        VISIT(st, expr, s->v.MyAssign.target);
+        VISIT(st, expr, s->v.MyAssign.value);
+        break;
     case For_kind:
         VISIT(st, expr, s->v.For.target);
         VISIT(st, expr, s->v.For.iter);
