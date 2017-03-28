@@ -2811,6 +2811,8 @@ compiler_visit_stmt(struct compiler *c, stmt_ty s)
         break;
     case AugAssign_kind:
         return compiler_augassign(c, s);
+    case MyAssign_kind:
+        return compiler_myassign(c, s);
     case AnnAssign_kind:
         return compiler_annassign(c, s);
     case For_kind:
@@ -4479,6 +4481,54 @@ compiler_augassign(struct compiler *c, stmt_ty s)
     }
     return 1;
 }
+
+//My Code
+static int
+compiler_myassign(struct compiler *c, stmt_ty s)
+{
+    expr_ty e = s->v.MyAssign.target;
+    expr_ty auge;
+
+    assert(s->kind == MyAssign_kind);
+
+    switch (e->kind) {
+    case Attribute_kind:
+        auge = Attribute(e->v.Attribute.value, e->v.Attribute.attr,
+                         AugLoad, e->lineno, e->col_offset, c->c_arena);
+        if (auge == NULL)
+            return 0;
+        VISIT(c, expr, auge);
+        VISIT(c, expr, s->v.MyAssign.value);
+        ADDOP(c, inplace_binop(c, s->v.MyAssign.op));
+        auge->v.Attribute.ctx = AugStore;
+        VISIT(c, expr, auge);
+        break;
+    case Subscript_kind:
+        auge = Subscript(e->v.Subscript.value, e->v.Subscript.slice,
+                         AugLoad, e->lineno, e->col_offset, c->c_arena);
+        if (auge == NULL)
+            return 0;
+        VISIT(c, expr, auge);
+        VISIT(c, expr, s->v.MyAssign.value);
+        ADDOP(c, inplace_binop(c, s->v.MyAssign.op));
+        auge->v.Subscript.ctx = AugStore;
+        VISIT(c, expr, auge);
+        break;
+    case Name_kind:
+        if (!compiler_nameop(c, e->v.Name.id, Load))
+            return 0;
+        VISIT(c, expr, s->v.MyAssign.value);
+        ADDOP(c, inplace_binop(c, s->v.MyAssign.op));
+        return compiler_nameop(c, e->v.Name.id, Store);
+    default:
+        PyErr_Format(PyExc_SystemError,
+            "invalid node type (%d) for My assignment",
+            e->kind);
+        return 0;
+    }
+    return 1;
+}
+//My Code
 
 static int
 check_ann_expr(struct compiler *c, expr_ty e)
